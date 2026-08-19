@@ -44,7 +44,10 @@ DEFAULT_ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "elni6767")
 
 # Mailconfiguratie (optioneel). Als MAIL_USERNAME niet is ingesteld,
 # wordt de afspraak enkel gelogd in de console i.p.v. effectief gemaild.
-app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
+# Standaard ingesteld op one.com's verstuurserver, omdat info@enah.be
+# daar gehost wordt. Gebruik je toch Gmail/Google Workspace, zet dan
+# de omgevingsvariabele MAIL_SERVER=smtp.gmail.com.
+app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER", "send.one.com")
 app.config["MAIL_PORT"] = int(os.environ.get("MAIL_PORT", 587))
 app.config["MAIL_USE_TLS"] = True
 app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
@@ -282,6 +285,12 @@ def init_db():
     db.commit()
 
     db.close()
+
+
+# Database initialiseren zodra deze module geladen wordt — dit moet buiten
+# de 'if __name__ == "__main__"'-check staan, want een WSGI-server (zoals
+# PythonAnywhere) roept dat blok nooit aan; hij importeert deze module enkel.
+init_db()
 
 
 # ---------------------------------------------------------------------------
@@ -603,6 +612,17 @@ def admin_auto_toevoegen():
 @login_required
 def admin_auto_verwijderen(auto_id):
     db = get_db()
+    # Verwijder eerst de gekoppelde foto's (bestand + databaserij), anders
+    # blijven ze als 'wees' achter op de schijf en in de auto_fotos-tabel.
+    fotos = db.execute("SELECT foto_url FROM auto_fotos WHERE auto_id = ?", (auto_id,)).fetchall()
+    for foto in fotos:
+        foto_url = foto["foto_url"]
+        if foto_url.startswith("/static/uploads/"):
+            filename = foto_url.replace("/static/uploads/", "")
+            filepath = os.path.join(UPLOAD_FOLDER, filename)
+            if os.path.exists(filepath):
+                os.remove(filepath)
+    db.execute("DELETE FROM auto_fotos WHERE auto_id = ?", (auto_id,))
     db.execute("DELETE FROM autos WHERE id = ?", (auto_id,))
     db.commit()
     flash("Wagen verwijderd.", "success")
@@ -801,5 +821,7 @@ def admin_activity_photo_verwijderen(photo_id):
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    init_db()
-    app.run(debug=True)
+    # Debug mode staat standaard UIT (veilig voor een live site). Lokaal
+    # kun je 'm aanzetten met: FLASK_DEBUG=1 python app.py
+    debug_mode = os.environ.get("FLASK_DEBUG", "0") == "1"
+    app.run(debug=debug_mode)

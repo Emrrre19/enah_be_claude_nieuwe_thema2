@@ -10,40 +10,6 @@
   </div>
 </div>
 
-{% if contact %}
-<div class="info-strip">
-  <dl class="glass-card">
-    <div>
-      <dt>Adres</dt>
-      <dd>
-        {{ contact.address }}
-        {% if current_user.is_authenticated %}
-        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='transport') }}" title="Adres bewerken">✏️</a>
-        {% endif %}
-      </dd>
-    </div>
-    <div>
-      <dt>Telefoon</dt>
-      <dd>
-        {{ contact.phone }}
-        {% if current_user.is_authenticated %}
-        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='transport') }}" title="Telefoon bewerken">✏️</a>
-        {% endif %}
-      </dd>
-    </div>
-    <div>
-      <dt>E-mail</dt>
-      <dd>
-        {{ contact.email }}
-        {% if current_user.is_authenticated %}
-        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='transport') }}" title="E-mail bewerken">✏️</a>
-        {% endif %}
-      </dd>
-    </div>
-  </dl>
-</div>
-{% endif %}
-
 <section class="container">
   <div class="service-banner-wrap">
     <img src="/static/images/transport_template.jpeg" alt="ENAH Transport & Levering — dienstenoverzicht" class="service-banner">

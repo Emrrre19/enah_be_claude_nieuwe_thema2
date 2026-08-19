@@ -100,7 +100,6 @@ p { margin: 0 0 14px; }
   text-transform: uppercase;
   color: var(--brand-2);
   margin-bottom: 14px;
-  min-height: 1.2rem;
 }
 
 .eyebrow::before {
@@ -214,26 +213,6 @@ p { margin: 0 0 14px; }
   color: var(--text);
 }
 
-/* ---------- HERO (legacy simple hero, still used as fallback) ---------- */
-.hero {
-  padding: 90px 32px;
-  text-align: center;
-  background: var(--ink);
-}
-
-.hero h1 {
-  font-size: 2.6rem;
-  margin-bottom: 16px;
-  color: var(--text);
-}
-
-.hero p {
-  color: var(--text-muted);
-  max-width: 560px;
-  margin: 0 auto;
-  font-size: 1.05rem;
-}
-
 /* ---------- HERO PHOTO (signature component) ----------
    A full-bleed band with a generated pattern standing in for a
    photo, a bottom-weighted dark gradient for legibility, and
@@ -278,53 +257,41 @@ p { margin: 0 0 14px; }
   max-width: 1140px;
   margin: 0 auto;
   padding: 60px 32px 104px;
-  min-height: 180px;
 }
 
 .hero-photo-inner h1 {
-  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-size: clamp(1.9rem, 3.8vw, 2.8rem);
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #fff;
   max-width: 1000px;
-  min-height: 5.5rem;
-  line-height: 1.15;
 }
 
 .hero-photo-inner p.lede {
   color: rgba(238,243,246,0.82);
   font-size: 1.14rem;
-  max-width: 800px;
+  max-width: 720px;
   margin-bottom: 0;
+}
+
+/* Same size/weight as a hero title, for pages where the title sits in a
+   plain content block instead of over the hero band itself (e.g. Lukoil,
+   where the title is placed below the video for legibility). Keeps
+   heading sizes consistent site-wide. */
+.page-title {
+  font-size: clamp(1.9rem, 3.8vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  max-width: 1000px;
+}
+
+.page-title + p.lede {
+  color: var(--text-muted);
+  font-size: 1.14rem;
+  max-width: 720px;
 }
 
 .hero-photo.hero-tall { min-height: 60vh; }
-
-/* ---------- HERO CONTENT (text below video) ---------- */
-.hero-content {
-  max-width: 1100px;
-  margin: -32px auto 0;
-  padding: 0 32px;
-  position: relative;
-  z-index: 2;
-}
-
-.hero-content h1 {
-  font-size: clamp(2.2rem, 5vw, 3.6rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: #fff;
-  margin-bottom: 16px;
-  min-height: 3.6rem;
-  line-height: 1.15;
-}
-
-.hero-content p.lede {
-  color: rgba(238,243,246,0.82);
-  font-size: 1.14rem;
-  max-width: 800px;
-  margin-bottom: 0;
-}
 
 /* a full-bleed photo (future use) is opaque and simply paints over the
    ambient pattern — no need to hide it explicitly. */
@@ -337,7 +304,9 @@ p { margin: 0 0 14px; }
   z-index: 0;
 }
 
-/* videos as full-bleed background */
+/* full-bleed background video (works well now that the uploaded clip is
+   high resolution — 1920x800). Same treatment as a full-bleed photo. */
+.hero-photo.has-media::before { display: none; }
 .hero-photo video.hero-media {
   position: absolute;
   inset: 0;
@@ -345,6 +314,23 @@ p { margin: 0 0 14px; }
   height: 100%;
   object-fit: cover;
   z-index: 0;
+}
+
+/* large logo watermark in the upper-right of the hero — unlike a
+   photo/video, a logo has meaningful content everywhere including the
+   edges, so it's shown uncropped (contain). Placed above/right of the
+   bottom-anchored title so the two never overlap. */
+.hero-photo .hero-logo-bg {
+  position: absolute;
+  top: 6%;
+  right: 4%;
+  width: auto;
+  height: 38%;
+  max-width: 34%;
+  object-fit: contain;
+  opacity: 0.5;
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* per-activity accent hooks — swap these for background-image later */
@@ -413,7 +399,9 @@ p { margin: 0 0 14px; }
 
 /* ---------- SERVICE BANNER (brand template posters per activity) ---------- */
 .service-banner-wrap {
-  margin: 0 0 56px;
+  margin: -118px 0 56px;
+  position: relative;
+  z-index: 3;
 }
 
 .service-banner {
@@ -902,7 +890,6 @@ footer {
 @media (max-width: 768px) {
   .navbar { flex-direction: column; gap: 12px; }
   .nav-links { flex-wrap: wrap; justify-content: center; }
-  .hero h1 { font-size: 2rem; }
   .hero-photo-inner h1 { font-size: 1.9rem; }
   .auto-grid { grid-template-columns: 1fr; }
   .cards-grid { grid-template-columns: repeat(2, 1fr); }
