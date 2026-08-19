@@ -1,0 +1,11 @@
+Plaats hier je originele afbeeldingen uit enah_website/images/:
+
+- enah_logo.jpeg
+- lukoil_logo.png
+- sixtyseven_cars_logo.jpeg
+
+De templates verwijzen al naar deze bestandsnamen via:
+{{ url_for('static', filename='images/enah_logo.jpeg') }}
+
+Zolang de bestanden hier niet staan, toont de browser een gebroken afbeeldingsicoon
+op de plek van het logo — de rest van de site blijft gewoon werken.

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Activiteit foto's – Admin{% endblock %}
+{% block content %}
+
+<section class="container">
+  <div class="admin-bar">
+    <h1 style="margin:0;">Activiteit foto's</h1>
+    <a class="btn" href="{{ url_for('admin_activity_photo_upload') }}">+ Foto uploaden</a>
+  </div>
+
+  <div class="admin-table">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Activiteit</th>
+          <th>Foto</th>
+          <th>Volgorde</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for photo in photos %}
+        <tr>
+          <td>{{ photo.activity_name }}</td>
+          <td>
+            <img src="{{ photo.photo_url }}" alt="Foto" style="width: 100px; height: 70px; object-fit: cover; border-radius: 8px;">
+          </td>
+          <td>{{ photo.photo_order }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('admin_activity_photo_verwijderen', photo_id=photo.id) }}" onsubmit="return confirm('Deze foto verwijderen?');" style="margin:0;">
+              <button class="btn btn-danger" type="submit">Verwijderen</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" style="color: var(--text-muted);">Nog geen foto's geüpload.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% endblock %}

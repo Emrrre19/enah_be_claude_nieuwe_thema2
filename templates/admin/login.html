@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Admin login – ENAH{% endblock %}
+{% block content %}
+
+<section class="container" style="max-width: 460px;">
+  <h1>Admin login</h1>
+  <form class="styled-form" method="POST">
+    <div>
+      <label for="username">Gebruikersnaam</label>
+      <input type="text" id="username" name="username" required autofocus>
+    </div>
+    <div>
+      <label for="password">Wachtwoord</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <button class="btn" type="submit">Inloggen</button>
+  </form>
+</section>
+
+{% endblock %}

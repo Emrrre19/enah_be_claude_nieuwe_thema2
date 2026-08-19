@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Video uploaden – ENAH{% endblock %}
+{% block content %}
+
+<section class="container" style="max-width: 800px;">
+  <div class="admin-bar">
+    <h1>Video uploaden</h1>
+    <a class="btn btn-secondary" href="{{ url_for('admin_dashboard') }}">Terug naar dashboard</a>
+  </div>
+  
+  <form class="styled-form" method="POST" enctype="multipart/form-data">
+    <div>
+      <label for="page_name">Pagina</label>
+      <select id="page_name" name="page_name" required>
+        <option value="lukoil">Lukoil</option>
+      </select>
+    </div>
+    <div>
+      <label for="video">Video bestand (mp4, webm, ogg)</label>
+      <input type="file" id="video" name="video" accept="video/*" required>
+      <small style="color: var(--text-muted);">Selecteer een video bestand (maximaal 50MB aanbevolen)</small>
+    </div>
+    <button class="btn" type="submit">Video uploaden</button>
+  </form>
+</section>
+
+{% endblock %}

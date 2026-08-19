@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}ENAH{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <nav class="navbar">
+    <a class="brand" href="{{ url_for('index') }}">
+      {% if active_page == 'lukoil' %}
+        <img src="{{ url_for('static', filename='images/lukoil_logo.png') }}" alt="Lukoil logo">
+        <span>Lukoil Heusen-Zolder</span>
+      {% elif active_page in ['auto_onderhoud', 'auto_verkoop'] %}
+        <img src="{{ url_for('static', filename='images/sixtyseven_cars_logo.jpeg') }}" alt="SixtySeven Cars logo">
+        <span>SixtySeven Cars</span>
+      {% else %}
+        <img src="{{ url_for('static', filename='images/enah_logo.jpeg') }}" alt="ENAH logo">
+        <span>ENAH</span>
+      {% endif %}
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="{{ url_for('index') }}" class="{{ 'active' if active_page == 'home' }}">Home</a></li>
+      <li class="dropdown">
+        <a href="#" class="{{ 'active' if active_page in ['lukoil','schoonmaak','transport','auto_onderhoud','auto_verkoop'] }}">Diensten</a>
+        <ul class="dropdown-menu">
+          <li><a href="{{ url_for('lukoil') }}">Lukoil</a></li>
+          <li><a href="{{ url_for('schoonmaak') }}">Schoonmaak</a></li>
+          <li><a href="{{ url_for('transport') }}">Transport</a></li>
+          <li><a href="{{ url_for('auto_onderhoud') }}">Auto onderhoud</a></li>
+          <li><a href="{{ url_for('auto_verkoop') }}">Auto verkoop</a></li>
+        </ul>
+      </li>
+      <li><a href="{{ url_for('about') }}" class="{{ 'active' if active_page == 'about' }}">Over ENAH</a></li>
+      <li><a href="{{ url_for('contact') }}" class="{{ 'active' if active_page == 'contact' }}">Contact</a></li>
+      {% if current_user.is_authenticated %}
+        <li><a href="{{ url_for('admin_dashboard') }}" class="{{ 'active' if active_page == 'admin' }}">Admin</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="container" style="padding-bottom: 0;">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2026 ENAH – Alle rechten voorbehouden</p>
+      <div class="footer-contact">
+        <p><strong>Contact:</strong></p>
+        <p>📧 {{ site_content.get('contact_email', 'info@enah.be') }} {% if current_user.is_authenticated %}<a class="edit-btn-inline" href="{{ url_for('admin_content_bewerken', content_key='contact_email') }}" title="E-mail bewerken">✏️</a>{% endif %}</p>
+        <p>📞 {{ site_content.get('contact_phone', '+32 4 00 00 00') }} {% if current_user.is_authenticated %}<a class="edit-btn-inline" href="{{ url_for('admin_content_bewerken', content_key='contact_phone') }}" title="Telefoon bewerken">✏️</a>{% endif %}</p>
+        <p>📍 {{ site_content.get('contact_location', 'Genk, België') }} {% if current_user.is_authenticated %}<a class="edit-btn-inline" href="{{ url_for('admin_content_bewerken', content_key='contact_location') }}" title="Locatie bewerken">✏️</a>{% endif %}</p>
+      </div>
+    </div>
+    {% if not current_user.is_authenticated %}
+      <a href="{{ url_for('admin_login') }}" class="admin-login-link">Admin login</a>
+    {% else %}
+      <a href="{{ url_for('admin_logout') }}" class="admin-login-link">Logout</a>
+    {% endif %}
+  </footer>
+
+</body>
+</html>

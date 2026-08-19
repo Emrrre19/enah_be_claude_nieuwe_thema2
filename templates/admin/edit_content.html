@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Content bewerken – ENAH{% endblock %}
+{% block content %}
+
+<section class="container" style="max-width: 800px;">
+  <div class="admin-bar">
+    <h1>Content bewerken</h1>
+    <a class="btn btn-secondary" href="{{ url_for('admin_content') }}">Terug</a>
+  </div>
+  
+  <form class="styled-form" method="POST">
+    <div>
+      <label for="content_key">Key</label>
+      <input type="text" id="content_key" name="content_key" value="{{ content.content_key }}" readonly style="background: var(--surface-2); opacity: 0.7;">
+    </div>
+    <div>
+      <label for="content_value">Content</label>
+      <textarea id="content_value" name="content_value" rows="12">{{ content.content_value }}</textarea>
+      <small style="color: var(--text-muted);">Gebruik \n voor nieuwe regels indien nodig.</small>
+    </div>
+    <button class="btn" type="submit">Opslaan</button>
+    <a class="btn btn-secondary" href="{{ url_for('admin_content') }}">Annuleren</a>
+  </form>
+</section>
+
+{% endblock %}

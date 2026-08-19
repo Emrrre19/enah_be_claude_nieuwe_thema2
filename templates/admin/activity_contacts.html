@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Activiteit contactgegevens – ENAH{% endblock %}
+{% block content %}
+
+<section class="container">
+  <div class="admin-bar">
+    <h1>Activiteit contactgegevens</h1>
+    <a class="btn btn-secondary" href="{{ url_for('admin_dashboard') }}">Terug naar dashboard</a>
+  </div>
+  
+  <p style="color: var(--text-muted); margin-bottom: 20px;">Hier kunt u de contactgegevens per activiteit aanpassen.</p>
+  
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Activiteit</th>
+        <th>Adres</th>
+        <th>Telefoon</th>
+        <th>E-mail</th>
+        <th>Laatst bijgewerkt</th>
+        <th>Acties</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for contact in contacts %}
+      <tr>
+        <td><strong>{{ contact.activity_name }}</strong></td>
+        <td>{{ contact.address or '-' }}</td>
+        <td>{{ contact.phone or '-' }}</td>
+        <td>{{ contact.email or '-' }}</td>
+        <td>{{ contact.updated_at }}</td>
+        <td>
+          <a class="btn" href="{{ url_for('admin_activity_contact_bewerken', activity_name=contact.activity_name) }}" style="padding: 8px 14px; font-size: 0.9rem;">Bewerken</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{% endblock %}

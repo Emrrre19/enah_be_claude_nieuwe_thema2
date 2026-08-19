@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Over ENAH{% endblock %}
+{% block content %}
+
+<div class="hero-photo hero-about hero-tall">
+  <div class="hero-photo-inner">
+    <span class="eyebrow">Over ENAH</span>
+    <h1>
+      {{ site_content.get('about_title', 'ENAH – Ondernemen met vertrouwen en ambitie') }}
+      {% if current_user.is_authenticated %}
+      <a class="edit-btn-inline" href="{{ url_for('admin_content_bewerken', content_key='about_title') }}" title="Titel bewerken">✏️</a>
+      {% endif %}
+    </h1>
+  </div>
+</div>
+
+<section class="container">
+  <div class="logo-banner">
+    <img src="/static/images/lukoil_logo.png" alt="Lukoil" class="brand-logo">
+    <img src="/static/images/enah_logo.jpeg" alt="ENAH" class="brand-logo">
+    <img src="/static/images/sixtyseven_cars_logo.jpeg" alt="Sixtysevencars" class="brand-logo">
+  </div>
+
+  {% set about_text = site_content.get('about_text', '') %}
+  {% if about_text %}
+    {% for paragraph in about_text.split('\n\n') %}
+      <p>
+        {{ paragraph }}
+        {% if current_user.is_authenticated and loop.first %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_content_bewerken', content_key='about_text') }}" title="Tekst bewerken">✏️</a>
+        {% endif %}
+      </p>
+    {% endfor %}
+  {% endif %}
+
+  <h2 class="section-title" style="text-align: left; margin-top: 40px;">
+    {{ site_content.get('vision_title', 'Onze visie') }}
+    {% if current_user.is_authenticated %}
+    <a class="edit-btn-inline" href="{{ url_for('admin_content_bewerken', content_key='vision_title') }}" title="Visie titel bewerken">✏️</a>
+    {% endif %}
+  </h2>
+  
+  {% set vision_text = site_content.get('vision_text', '') %}
+  {% if vision_text %}
+    {% for paragraph in vision_text.split('\n\n') %}
+      <p>
+        {{ paragraph }}
+        {% if current_user.is_authenticated and loop.first %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_content_bewerken', content_key='vision_text') }}" title="Visie tekst bewerken">✏️</a>
+        {% endif %}
+      </p>
+    {% endfor %}
+  {% endif %}
+  
+  <p style="font-weight: 600; color: var(--brand-2); margin-top: 30px;">
+    {{ site_content.get('about_footer', 'ENAH – een familiebedrijf met een sterke basis, een brede dienstverlening en een duidelijke blik op de toekomst.') }}
+    {% if current_user.is_authenticated %}
+    <a class="edit-btn-inline" href="{{ url_for('admin_content_bewerken', content_key='about_footer') }}" title="Footer bewerken">✏️</a>
+    {% endif %}
+  </p>
+</section>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Wagen toevoegen – ENAH{% endblock %}
+{% block content %}
+
+<section class="container" style="max-width: 560px;">
+  <h1>Wagen toevoegen</h1>
+  <form class="styled-form" method="POST" enctype="multipart/form-data">
+    <div>
+      <label for="merk">Merk *</label>
+      <input type="text" id="merk" name="merk" required>
+    </div>
+    <div>
+      <label for="model">Model *</label>
+      <input type="text" id="model" name="model" required>
+    </div>
+    <div>
+      <label for="jaar">Bouwjaar *</label>
+      <input type="number" id="jaar" name="jaar" min="1950" max="2100" required>
+    </div>
+    <div>
+      <label for="prijs">Prijs (&euro;) *</label>
+      <input type="number" id="prijs" name="prijs" min="0" step="0.01" required>
+    </div>
+    <div>
+      <label for="beschrijving">Beschrijving</label>
+      <textarea id="beschrijving" name="beschrijving"></textarea>
+    </div>
+    <div>
+      <label for="fotos">Foto's (meerdere mogelijk)</label>
+      <input type="file" id="fotos" name="fotos" accept="image/*" multiple>
+      <small style="color: var(--text-muted);">Selecteer één of meerdere foto's</small>
+    </div>
+    <div>
+      <label for="extra_info">Extra informatie</label>
+      <textarea id="extra_info" name="extra_info" placeholder="Optionele extra informatie over de auto..."></textarea>
+    </div>
+    <button class="btn" type="submit">Wagen opslaan</button>
+    <a class="btn btn-secondary" href="{{ url_for('admin_dashboard') }}">Annuleren</a>
+  </form>
+</section>
+
+{% endblock %}

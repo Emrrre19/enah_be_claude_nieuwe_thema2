@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Content beheer – ENAH{% endblock %}
+{% block content %}
+
+<section class="container">
+  <div class="admin-bar">
+    <h1>Content beheer</h1>
+    <a class="btn btn-secondary" href="{{ url_for('admin_dashboard') }}">Terug naar dashboard</a>
+  </div>
+  
+  <p style="color: var(--text-muted); margin-bottom: 20px;">Hier kunt u de teksten op de website aanpassen.</p>
+  
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Key</th>
+        <th>Beschrijving</th>
+        <th>Laatst bijgewerkt</th>
+        <th>Acties</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in content %}
+      <tr>
+        <td><code>{{ item.content_key }}</code></td>
+        <td>
+          {% if item.content_key == 'contact_email' %}Contact e-mail
+          {% elif item.content_key == 'contact_location' %}Contact locatie
+          {% elif item.content_key == 'contact_company' %}Contact bedrijf
+          {% elif item.content_key == 'contact_phone' %}Contact telefoon
+          {% elif item.content_key == 'contact_region' %}Contact regio
+          {% elif item.content_key == 'about_title' %}Over ons titel
+          {% elif item.content_key == 'about_text' %}Over ons tekst
+          {% elif item.content_key == 'vision_title' %}Visie titel
+          {% elif item.content_key == 'vision_text' %}Visie tekst
+          {% elif item.content_key == 'about_footer' %}Over ons footer
+          {% else %}{{ item.content_key }}
+          {% endif %}
+        </td>
+        <td>{{ item.updated_at }}</td>
+        <td>
+          <a class="btn" href="{{ url_for('admin_content_bewerken', content_key=item.content_key) }}" style="padding: 8px 14px; font-size: 0.9rem;">Bewerken</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{% endblock %}

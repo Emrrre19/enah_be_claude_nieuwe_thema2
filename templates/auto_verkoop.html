@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% block title %}Auto verkoop – ENAH{% endblock %}
+{% block content %}
+
+<script>
+function changePhoto(autoId, thumbnail, photoUrl) {
+  // Update main photo
+  const mainPhoto = document.getElementById('main-photo-' + autoId);
+  mainPhoto.querySelector('img').src = photoUrl;
+  
+  // Update lightbox click to use current photo
+  mainPhoto.querySelector('img').onclick = function() {
+    openLightbox(photoUrl);
+  };
+  
+  // Update active thumbnail
+  const thumbnails = thumbnail.parentElement.querySelectorAll('.thumbnail');
+  thumbnails.forEach(t => t.classList.remove('active'));
+  thumbnail.classList.add('active');
+}
+
+function openLightbox(photoUrl) {
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  lightboxImg.src = photoUrl;
+  lightbox.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  const lightbox = document.getElementById('lightbox');
+  lightbox.style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+// Close lightbox on background click
+document.addEventListener('DOMContentLoaded', function() {
+  const lightbox = document.getElementById('lightbox');
+  if (lightbox) {
+    lightbox.addEventListener('click', function(e) {
+      if (e.target === lightbox) {
+        closeLightbox();
+      }
+    });
+  }
+  
+  const autoModal = document.getElementById('auto-modal');
+  if (autoModal) {
+    autoModal.addEventListener('click', function(e) {
+      if (e.target === autoModal) {
+        closeAutoModal();
+      }
+    });
+  }
+  
+  // Close on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeLightbox();
+      closeAutoModal();
+    }
+  });
+});
+
+// Auto data storage for modal
+const autosData = {
+  {% for auto in autos %}
+  {{ auto.id }}: {
+    id: {{ auto.id }},
+    merk: {{ auto.merk | tojson | safe }},
+    model: {{ auto.model | tojson | safe }},
+    jaar: {{ auto.jaar }},
+    prijs: {{ auto.prijs }},
+    beschrijving: {{ auto.beschrijving | tojson | safe }},
+    extra_info: {{ (auto.extra_info or '') | tojson | safe }},
+    fotos: {{ auto.fotos | tojson | safe }}
+  }{% if not loop.last %},{% endif %}
+  {% else %}
+  // No autos available
+  {% endfor %}
+};
+
+function openAutoModal(autoId) {
+  const auto = autosData[autoId];
+  if (!auto) return;
+  
+  const modal = document.getElementById('auto-modal');
+  const modalTitle = document.getElementById('modal-title');
+  const modalSpecs = document.getElementById('modal-specs');
+  const modalGallery = document.getElementById('modal-gallery');
+  
+  if (!modal || !modalTitle || !modalSpecs || !modalGallery) return;
+  
+  modalTitle.textContent = `${auto.merk} ${auto.model}`;
+  modalSpecs.innerHTML = `
+    <p><strong>Bouwjaar:</strong> ${auto.jaar}</p>
+    <p><strong>Beschrijving:</strong> ${auto.beschrijving}</p>
+    ${auto.extra_info ? `<p><strong>Extra info:</strong> ${auto.extra_info}</p>` : ''}
+    <p class="modal-price"><strong>Prijs:</strong> &euro; ${auto.prijs.toFixed(2)}</p>
+  `;
+  
+  if (auto.fotos && auto.fotos.length > 0) {
+    modalGallery.innerHTML = `
+      <div class="modal-main-photo">
+        <img id="modal-main-img" src="${auto.fotos[0]}" alt="${auto.merk} ${auto.model}" 
+             style="cursor: pointer;" onclick="openModalLightbox('${auto.fotos[0]}')">
+      </div>
+      ${auto.fotos.length > 1 ? `
+      <div class="modal-thumbnails">
+        ${auto.fotos.map((foto, index) => `
+          <img src="${foto}" alt="Foto" class="modal-thumbnail ${index === 0 ? 'active' : ''}" 
+               onclick="changeModalPhoto(this, '${foto}')">
+        `).join('')}
+      </div>
+      ` : ''}
+    `;
+  } else {
+    modalGallery.innerHTML = '<div class="modal-placeholder">Geen foto\'s beschikbaar</div>';
+  }
+  
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAutoModal() {
+  const modal = document.getElementById('auto-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+}
+
+function changeModalPhoto(thumbnail, photoUrl) {
+  const mainImg = document.getElementById('modal-main-img');
+  if (mainImg) {
+    mainImg.src = photoUrl;
+    mainImg.onclick = function() {
+      openModalLightbox(photoUrl);
+    };
+  }
+  
+  const thumbnails = thumbnail.parentElement.querySelectorAll('.modal-thumbnail');
+  thumbnails.forEach(t => t.classList.remove('active'));
+  thumbnail.classList.add('active');
+}
+
+function openModalLightbox(photoUrl) {
+  openLightbox(photoUrl);
+}
+</script>
+
+<div class="hero-photo hero-verkoop hero-tall">
+  <div class="hero-photo-inner">
+    <span class="eyebrow">SixtySeven Cars — Verkoop</span>
+    <h1>Nieuwe en tweedehandswagens tegen eerlijke prijzen.</h1>
+    <p class="lede">Elk voertuig in ons aanbod wordt gecontroleerd voordat het bij u terechtkomt. Bekijk hieronder de beschikbare wagens.</p>
+  </div>
+</div>
+
+<section class="container">
+   <div class="service-banner-wrap">
+    <img src="/static/images/autoverkoop_template.jpeg" alt="SixtySeven Cars Verkoop — dienstenoverzicht" class="service-banner">
+  </div>
+
+   <h2 class="section-title" style="text-align:left;">Beschikbare wagens</h2>
+
+  {% if autos %}
+  <div class="auto-grid">
+    {% for auto in autos %}
+    <div class="auto-card">
+      <div class="auto-gallery">
+        {% if auto.fotos %}
+          <div class="main-photo" id="main-photo-{{ auto.id }}">
+            <img src="{{ auto.fotos[0] }}" alt="{{ auto.merk }} {{ auto.model }}" 
+                 onclick="openLightbox('{{ auto.fotos[0] }}')" style="cursor: pointer;">
+          </div>
+          {% if auto.fotos|length > 1 %}
+          <div class="photo-thumbnails">
+            {% for foto in auto.fotos %}
+            <img src="{{ foto }}" alt="Foto" class="thumbnail {% if loop.first %}active{% endif %}" 
+                 onclick="changePhoto('{{ auto.id }}', this, '{{ foto }}')"
+                 onmouseenter="changePhoto('{{ auto.id }}', this, '{{ foto }}')">
+            {% endfor %}
+          </div>
+          {% endif %}
+        {% else %}
+          <div class="auto-visual"></div>
+        {% endif %}
+      </div>
+      <div class="auto-body" onclick="openAutoModal({{ auto.id }})" style="cursor: pointer;">
+        <h3>{{ auto.merk }} {{ auto.model }}</h3>
+        <div class="auto-specs">
+          <p><strong>Bouwjaar:</strong> {{ auto.jaar }}</p>
+          <p><strong>Beschrijving:</strong> {{ auto.beschrijving }}</p>
+          {% if auto.extra_info %}
+          <p><strong>Extra info:</strong> {{ auto.extra_info }}</p>
+          {% endif %}
+          <p class="prijs">&euro; {{ "%.2f"|format(auto.prijs) }}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p style="color: var(--text-muted);">Er staan momenteel geen wagens online. Neem <a href="{{ url_for('contact') }}">contact</a> op voor het actuele aanbod.</p>
+  {% endif %}
+
+  {% if contact %}
+  <div class="detail-page" style="margin-top: 60px;">
+    <dl class="info-box">
+      <dt>Adres</dt>
+      <dd>
+        {{ contact.address }}
+        {% if current_user.is_authenticated %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='auto_verkoop') }}" title="Adres bewerken">✏️</a>
+        {% endif %}
+      </dd>
+      <dt>Telefoon</dt>
+      <dd>
+        {{ contact.phone }}
+        {% if current_user.is_authenticated %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='auto_verkoop') }}" title="Telefoon bewerken">✏️</a>
+        {% endif %}
+      </dd>
+      <dt>E-mail</dt>
+      <dd>
+        {{ contact.email }}
+        {% if current_user.is_authenticated %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='auto_verkoop') }}" title="E-mail bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </dl>
+  </div>
+  {% endif %}
+
+</section>
+
+<!-- Lightbox Modal -->
+<div id="lightbox" class="lightbox" style="display: none;">
+  <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+  <img id="lightbox-img" class="lightbox-content" src="" alt="Vergrote foto">
+</div>
+
+<!-- Auto Detail Modal -->
+<div id="auto-modal" class="auto-modal" style="display: none;">
+  <span class="modal-close" onclick="closeAutoModal()">&times;</span>
+  <div class="modal-content">
+    <div class="modal-left">
+      <h2 id="modal-title"></h2>
+      <div id="modal-specs" class="modal-specs"></div>
+    </div>
+    <div class="modal-right">
+      <div id="modal-gallery" class="modal-gallery"></div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

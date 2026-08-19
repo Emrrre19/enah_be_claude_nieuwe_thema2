@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Foto uploaden – Admin{% endblock %}
+{% block content %}
+
+<section class="container">
+  <div class="admin-bar">
+    <h1 style="margin:0;">Foto uploaden</h1>
+    <a class="btn btn-secondary" href="{{ url_for('admin_activity_photos') }}">Terug</a>
+  </div>
+
+  <form class="styled-form" method="POST" enctype="multipart/form-data">
+    <div>
+      <label for="activity_name">Activiteit *</label>
+      <select id="activity_name" name="activity_name" required>
+        <option value="">Selecteer een activiteit</option>
+        <option value="transport">Transport</option>
+        <option value="schoonmaak">Schoonmaak</option>
+        <option value="lukoil">Lukoil</option>
+        <option value="auto_onderhoud">Auto Onderhoud</option>
+        <option value="auto_verkoop">Auto Verkoop</option>
+      </select>
+    </div>
+    <div>
+      <label for="photo">Foto *</label>
+      <input type="file" id="photo" name="photo" accept="image/*" required>
+    </div>
+    <button class="btn" type="submit">Foto uploaden</button>
+  </form>
+</section>
+
+{% endblock %}

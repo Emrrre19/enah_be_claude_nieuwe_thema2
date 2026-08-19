@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Lukoil – ENAH{% endblock %}
+{% block content %}
+
+<div class="hero-photo hero-lukoil hero-tall {% if video_url %}has-media{% endif %}">
+  {% if video_url %}
+  <video autoplay muted loop playsinline class="hero-media">
+    <source src="{{ video_url }}" type="video/mp4">
+    <source src="{{ video_url }}" type="video/webm">
+    <source src="{{ video_url }}" type="video/ogg">
+  </video>
+  {% endif %}
+</div>
+
+<div class="hero-content">
+  <span class="eyebrow">Dienst — Tankstation</span>
+  <h1>Lukoil Heusden-Zolder</h1>
+  <p class="lede">ENAH beheert het Lukoil-tankstation in Heusen-Zolder en staat in voor een klantgerichte service en betrouwbare brandstofverdeling.</p>
+</div>
+
+<div class="info-strip">
+  <dl class="glass-card">
+    <div>
+      <dt>Adres</dt>
+      <dd>
+        {{ contact.address if contact else 'Niet beschikbaar' }}
+        {% if current_user.is_authenticated and contact %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='lukoil') }}" title="Adres bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>Telefoon</dt>
+      <dd>
+        {{ contact.phone if contact else 'Niet beschikbaar' }}
+        {% if current_user.is_authenticated and contact %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='lukoil') }}" title="Telefoon bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>E-mail</dt>
+      <dd>
+        {{ contact.email if contact else 'Niet beschikbaar' }}
+        {% if current_user.is_authenticated and contact %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='lukoil') }}" title="E-mail bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </div>
+  </dl>
+</div>
+
+<div style="height: 60px;"></div>
+
+{% endblock %}

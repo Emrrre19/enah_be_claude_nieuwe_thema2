@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Transport – ENAH{% endblock %}
+{% block content %}
+
+<div class="hero-photo hero-transport hero-tall">
+  <div class="hero-photo-inner">
+    <span class="eyebrow">Dienst — Transport</span>
+    <h1>Gespecialiseerd transport waar betrouwbaarheid vooropstaat.</h1>
+    <p class="lede">Onze vloot en team staan garant voor stipte, zorgvuldige leveringen — vandaag en morgen.</p>
+  </div>
+</div>
+
+{% if contact %}
+<div class="info-strip">
+  <dl class="glass-card">
+    <div>
+      <dt>Adres</dt>
+      <dd>
+        {{ contact.address }}
+        {% if current_user.is_authenticated %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='transport') }}" title="Adres bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>Telefoon</dt>
+      <dd>
+        {{ contact.phone }}
+        {% if current_user.is_authenticated %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='transport') }}" title="Telefoon bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>E-mail</dt>
+      <dd>
+        {{ contact.email }}
+        {% if current_user.is_authenticated %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='transport') }}" title="E-mail bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </div>
+  </dl>
+</div>
+{% endif %}
+
+<section class="container">
+  <div class="service-banner-wrap">
+    <img src="/static/images/transport_template.jpeg" alt="ENAH Transport & Levering — dienstenoverzicht" class="service-banner">
+  </div>
+
+  <h2 class="section-title" style="text-align:left;">Onze voertuigen</h2>
+  <div class="transport-gallery">
+    {% if photos %}
+      {% for photo_url in photos %}
+      <img src="{{ photo_url }}" alt="Transport voertuig {{ loop.index }}" class="transport-photo">
+      {% endfor %}
+    {% else %}
+      <img src="/static/images/transport1.jpeg" alt="Transport voertuig 1" class="transport-photo">
+      <img src="/static/images/transport2.jpeg" alt="Transport voertuig 2" class="transport-photo">
+    {% endif %}
+  </div>
+
+  <div class="cta-banner">
+    <div>
+      <h3>Offerte nodig voor transport?</h3>
+      <p>Vraag vrijblijvend een offerte aan via ons contactformulier.</p>
+    </div>
+    <a class="btn" href="{{ url_for('contact') }}?dienst=Transport">Offerte aanvragen</a>
+  </div>
+
+</section>
+
+{% endblock %}

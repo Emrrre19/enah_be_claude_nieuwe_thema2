@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Auto Onderhoud – ENAH{% endblock %}
+{% block content %}
+
+<div class="hero-photo hero-onderhoud hero-tall">
+  <div class="hero-photo-inner">
+    <span class="eyebrow">SixtySeven Cars — Onderhoud</span>
+    <h1>Onderhoud en herstellingen, vakkundig uitgevoerd.</h1>
+    <p class="lede">Periodiek onderhoud, herstellingen en service op maat — snel geholpen, eerlijk geadviseerd.</p>
+  </div>
+</div>
+
+<section class="container">
+  <div class="service-banner-wrap">
+    <img src="/static/images/autoonderhoud_template.jpeg" alt="SixtySeven Cars Onderhoud — dienstenoverzicht" class="service-banner">
+  </div>
+
+  <h2 class="section-title" style="text-align:left;">Afspraak aanvragen</h2>
+  <div class="cta-banner">
+    <div>
+      <h3>Afspraak nodig voor onderhoud?</h3>
+      <p>Vraag vrijblijvend een afspraak aan via ons contactformulier.</p>
+    </div>
+    <a class="btn" href="{{ url_for('contact') }}?dienst=Auto%20onderhoud">Afspraak aanvragen</a>
+  </div>
+</section>
+
+{% endblock %}

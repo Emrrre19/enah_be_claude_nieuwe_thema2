@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Contactgegevens bewerken – ENAH{% endblock %}
+{% block content %}
+
+<section class="container" style="max-width: 800px;">
+  <div class="admin-bar">
+    <h1>Contactgegevens bewerken</h1>
+    <a class="btn btn-secondary" href="{{ url_for('admin_activity_contacts') }}">Terug</a>
+  </div>
+  
+  <form class="styled-form" method="POST">
+    <div>
+      <label for="activity_name">Activiteit</label>
+      <input type="text" id="activity_name" name="activity_name" value="{{ contact.activity_name }}" readonly style="background: var(--surface-2); opacity: 0.7;">
+    </div>
+    <div>
+      <label for="address">Adres</label>
+      <input type="text" id="address" name="address" value="{{ contact.address }}">
+    </div>
+    <div>
+      <label for="phone">Telefoon</label>
+      <input type="text" id="phone" name="phone" value="{{ contact.phone }}">
+    </div>
+    <div>
+      <label for="email">E-mail</label>
+      <input type="email" id="email" name="email" value="{{ contact.email }}">
+    </div>
+    <button class="btn" type="submit">Opslaan</button>
+    <a class="btn btn-secondary" href="{{ url_for('admin_activity_contacts') }}">Annuleren</a>
+  </form>
+</section>
+
+{% endblock %}

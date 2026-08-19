@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Contact – ENAH{% endblock %}
+{% block content %}
+
+<div class="hero-photo hero-contact hero-tall">
+  <div class="hero-photo-inner">
+    <span class="eyebrow">Contact</span>
+    <h1>Neem gerust contact met ons op.</h1>
+    <p class="lede">Voor vragen, offertes of samenwerkingen staat het ENAH-team voor u klaar.</p>
+  </div>
+</div>
+
+<div class="info-strip">
+  <dl class="glass-card">
+    <div>
+      <dt>Bedrijf</dt>
+      <dd>
+        {{ site_content.get('contact_company', 'ENAH') }}
+        {% if current_user.is_authenticated %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_content_bewerken', content_key='contact_company') }}" title="Bedrijf bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>E-mail</dt>
+      <dd>
+        {{ site_content.get('contact_email', 'info@enah.be') }}
+        {% if current_user.is_authenticated %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_content_bewerken', content_key='contact_email') }}" title="E-mail bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>Telefoon</dt>
+      <dd>
+        {{ site_content.get('contact_phone', '+32 4 00 00 00') }}
+        {% if current_user.is_authenticated %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_content_bewerken', content_key='contact_phone') }}" title="Telefoon bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>Regio</dt>
+      <dd>
+        {{ site_content.get('contact_region', 'België') }}
+        {% if current_user.is_authenticated %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_content_bewerken', content_key='contact_region') }}" title="Regio bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </div>
+  </dl>
+</div>
+
+<section class="container" style="padding-top: 50px;">
+  <div class="info-box offerte-form" style="max-width: 560px; margin: 0 auto;">
+    <h3>Offerte of afspraak aanvragen</h3>
+    <form class="styled-form compact" method="POST" action="{{ url_for('afspraak') }}">
+      <div>
+        <label for="naam">Naam *</label>
+        <input type="text" id="naam" name="naam" required value="{{ form_data.naam if form_data else '' }}">
+      </div>
+      <div>
+        <label for="email">E-mail *</label>
+        <input type="email" id="email" name="email" required value="{{ form_data.email if form_data else '' }}">
+      </div>
+      <div>
+        <label for="telefoon">Telefoon</label>
+        <input type="tel" id="telefoon" name="telefoon" value="{{ form_data.telefoon if form_data else '' }}">
+      </div>
+      <div>
+        <label for="dienst">Dienst *</label>
+        <select id="dienst" name="dienst" required>
+          <option value="" disabled {% if not (form_data and form_data.dienst) %}selected{% endif %}>Kies een dienst</option>
+          <option value="Schoonmaak" {% if form_data and form_data.dienst == 'Schoonmaak' %}selected{% endif %}>Schoonmaak</option>
+          <option value="Transport" {% if form_data and form_data.dienst == 'Transport' %}selected{% endif %}>Transport</option>
+          <option value="Auto onderhoud" {% if form_data and form_data.dienst == 'Auto onderhoud' %}selected{% endif %}>Auto onderhoud</option>
+          <option value="Andere" {% if form_data and form_data.dienst == 'Andere' %}selected{% endif %}>Andere</option>
+        </select>
+      </div>
+      <div>
+        <label for="bericht">Bericht</label>
+        <textarea id="bericht" name="bericht">{{ form_data.bericht if form_data else '' }}</textarea>
+      </div>
+      <button class="btn" type="submit">Aanvraag versturen</button>
+    </form>
+  </div>
+</section>
+
+<div style="height: 60px;"></div>
+
+{% endblock %}

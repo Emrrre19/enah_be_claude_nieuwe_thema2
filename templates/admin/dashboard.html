@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Admin dashboard – ENAH{% endblock %}
+{% block content %}
+
+<section class="container">
+  <div class="admin-bar">
+    <h1 style="margin:0;">Admin dashboard</h1>
+    <a class="btn btn-secondary" href="{{ url_for('admin_logout') }}">Uitloggen</a>
+  </div>
+
+  <div class="admin-actions-grid">
+    <a class="admin-action-card" href="{{ url_for('admin_auto_toevoegen') }}">
+      <div class="admin-action-icon">🚗</div>
+      <h3>Nieuwe wagen</h3>
+      <p>Voeg een nieuwe wagen toe aan het aanbod</p>
+    </a>
+    
+    <a class="admin-action-card" href="{{ url_for('admin_content') }}">
+      <div class="admin-action-icon">📝</div>
+      <h3>Teksten aanpassen</h3>
+      <p>Bewerk website teksten en content</p>
+    </a>
+    
+    <a class="admin-action-card" href="{{ url_for('admin_activity_contacts') }}">
+      <div class="admin-action-icon">📞</div>
+      <h3>Contactgegevens</h3>
+      <p>Beheer contactgegevens per activiteit</p>
+    </a>
+    
+    <a class="admin-action-card" href="{{ url_for('admin_activity_photos') }}">
+      <div class="admin-action-icon">📷</div>
+      <h3>Activiteit foto's</h3>
+      <p>Beheer foto's per activiteit</p>
+    </a>
+    
+    <a class="admin-action-card" href="{{ url_for('admin_video_upload') }}">
+      <div class="admin-action-icon">🎥</div>
+      <h3>Video's uploaden</h3>
+      <p>Upload video's voor activiteit pagina's</p>
+    </a>
+  </div>
+
+  <h2 class="section-title" style="text-align:left; margin-top:40px;">Wagens beheren</h2>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Merk</th><th>Model</th><th>Jaar</th><th>Prijs</th><th>Beschrijving</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for auto in autos %}
+      <tr>
+        <td>{{ auto.merk }}</td>
+        <td>{{ auto.model }}</td>
+        <td>{{ auto.jaar }}</td>
+        <td>&euro; {{ "%.2f"|format(auto.prijs) }}</td>
+        <td>{{ auto.beschrijving }}</td>
+        <td>
+          <form method="POST" action="{{ url_for('admin_auto_verwijderen', auto_id=auto.id) }}" onsubmit="return confirm('Deze wagen verwijderen?');" style="margin:0;">
+            <button class="btn btn-danger" type="submit">Verwijderen</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" style="color: var(--text-muted);">Nog geen wagens toegevoegd.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2 class="section-title" style="text-align:left; margin-top:40px;">Recente afspraakaanvragen</h2>
+  <table class="admin-table">
+    <thead>
+      <tr><th>Naam</th><th>E-mail</th><th>Telefoon</th><th>Dienst</th><th>Bericht</th><th>Datum</th></tr>
+    </thead>
+    <tbody>
+      {% for afspraak in afspraken %}
+      <tr>
+        <td>{{ afspraak.naam }}</td>
+        <td>{{ afspraak.email }}</td>
+        <td>{{ afspraak.telefoon }}</td>
+        <td>{{ afspraak.dienst }}</td>
+        <td>{{ afspraak.bericht }}</td>
+        <td>{{ afspraak.datum_aangemaakt }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" style="color: var(--text-muted);">Nog geen afspraken.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+{% endblock %}

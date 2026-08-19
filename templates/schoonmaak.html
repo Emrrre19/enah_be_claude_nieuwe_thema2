@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Schoonmaak – ENAH{% endblock %}
+{% block content %}
+
+<div class="hero-photo hero-schoonmaak hero-tall">
+  <div class="hero-photo-inner">
+    <span class="eyebrow">Dienst — Schoonmaak</span>
+    <h1>Professionele schoonmaak, tot in het kleinste detail.</h1>
+    <p class="lede">Voor bedrijven en particulieren: een grondige, betrouwbare schoonmaakdienst op maat van uw ruimte.</p>
+  </div>
+</div>
+
+{% if contact %}
+<div class="info-strip">
+  <dl class="glass-card">
+    <div>
+      <dt>Adres</dt>
+      <dd>
+        {{ contact.address }}
+        {% if current_user.is_authenticated %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='schoonmaak') }}" title="Adres bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>Telefoon</dt>
+      <dd>
+        {{ contact.phone }}
+        {% if current_user.is_authenticated %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='schoonmaak') }}" title="Telefoon bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </div>
+    <div>
+      <dt>E-mail</dt>
+      <dd>
+        {{ contact.email }}
+        {% if current_user.is_authenticated %}
+        <a class="edit-btn-inline" href="{{ url_for('admin_activity_contact_bewerken', activity_name='schoonmaak') }}" title="E-mail bewerken">✏️</a>
+        {% endif %}
+      </dd>
+    </div>
+  </dl>
+</div>
+{% endif %}
+
+<section class="container">
+  <div class="service-banner-wrap">
+    <img src="/static/images/schoonmaak_template.jpeg" alt="ENAH Schoonmaak — dienstenoverzicht" class="service-banner">
+  </div>
+
+  <h2 class="section-title" style="text-align:left;">Sfeerbeelden</h2>
+  <div class="schoonmaak-gallery">
+    {% if photos %}
+      {% for photo_url in photos %}
+      <img src="{{ photo_url }}" alt="Schoonmaak {{ loop.index }}" class="schoonmaak-photo">
+      {% endfor %}
+    {% else %}
+      <img src="/static/images/schoonmaak1.jpeg" alt="Schoonmaak 1" class="schoonmaak-photo">
+      <img src="/static/images/schoonmaak2.jpeg" alt="Schoonmaak 2" class="schoonmaak-photo">
+      <img src="/static/images/schoonmaak3.jpeg" alt="Schoonmaak 3" class="schoonmaak-photo">
+      <img src="/static/images/schoonmaak4.jpeg" alt="Schoonmaak 4" class="schoonmaak-photo">
+      <img src="/static/images/schoonmaak5.jpeg" alt="Schoonmaak 5" class="schoonmaak-photo">
+      <img src="/static/images/schoonmaak6.jpeg" alt="Schoonmaak 6" class="schoonmaak-photo">
+    {% endif %}
+  </div>
+
+  <div class="cta-banner">
+    <div>
+      <h3>Offerte nodig voor schoonmaak?</h3>
+      <p>Vraag vrijblijvend een offerte aan via ons contactformulier.</p>
+    </div>
+    <a class="btn" href="{{ url_for('contact') }}?dienst=Schoonmaak">Offerte aanvragen</a>
+  </div>
+
+</section>
+
+{% endblock %}

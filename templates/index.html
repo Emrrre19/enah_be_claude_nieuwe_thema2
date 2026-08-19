@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}ENAH – Home{% endblock %}
+{% block content %}
+
+<div class="hero-photo hero-home hero-tall">
+  <div class="hero-photo-inner">
+    <span class="eyebrow">ENAH — Familiebedrijf uit Genk</span>
+    <h1>Eén familiebedrijf, vijf diensten waarop u kunt bouwen.</h1>
+    <p class="lede">Van tankstation tot transport, van schoonmaak tot tweedehandswagens — ENAH combineert ondernemerschap met een persoonlijke aanpak in heel Limburg.</p>
+  </div>
+</div>
+
+<section class="home-container">
+  <div class="logo-banner" style="margin-top: 40px;">
+    <img src="/static/images/lukoil_logo.png" alt="Lukoil" class="brand-logo">
+    <img src="/static/images/enah_logo.jpeg" alt="ENAH" class="brand-logo">
+    <img src="/static/images/sixtyseven_cars_logo.jpeg" alt="Sixtysevencars" class="brand-logo">
+  </div>
+
+  <div class="highlights-strip" style="margin-top: 60px;">
+    <div class="highlight-item">
+      <strong>5</strong>
+      <span>Diensten onder één dak</span>
+    </div>
+    <div class="highlight-item">
+      <strong>Familiebedrijf</strong>
+      <span>Persoonlijke aanpak, korte lijnen</span>
+    </div>
+    <div class="highlight-item">
+      <strong>Limburg</strong>
+      <span>Actief in de hele regio</span>
+    </div>
+  </div>
+
+  {% set intro = site_content.get('about_text', '') %}
+  {% if intro %}
+  <div class="intro-teaser">
+    <p>{{ intro.split('\n\n')[0] }}</p>
+    <a href="{{ url_for('about') }}">Meer over ENAH →</a>
+  </div>
+  {% endif %}
+
+  <h2 class="section-title">Onze diensten</h2>
+  <div class="cards-grid">
+    <a class="card" href="{{ url_for('lukoil') }}">
+      <h3>Lukoil</h3>
+      <p>Tankstation Heusen-Zolder met klantgerichte service.</p>
+    </a>
+    <a class="card" href="{{ url_for('schoonmaak') }}">
+      <h3>Schoonmaak</h3>
+      <p>Professionele schoonmaak voor bedrijven en particulieren.</p>
+    </a>
+    <a class="card" href="{{ url_for('transport') }}">
+      <h3>Transport</h3>
+      <p>Gespecialiseerd transport met focus op betrouwbaarheid.</p>
+    </a>
+    <a class="card" href="{{ url_for('auto_onderhoud') }}">
+      <h3>Auto onderhoud</h3>
+      <p>Periodiek onderhoud, reparaties en service op maat.</p>
+    </a>
+    <a class="card" href="{{ url_for('auto_verkoop') }}">
+      <h3>Auto verkoop</h3>
+      <p>Nieuwe en tweedehandswagens aan eerlijke prijzen.</p>
+    </a>
+  </div>
+</section>
+
+{% endblock %}
