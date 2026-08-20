@@ -7,24 +7,52 @@ function changePhoto(autoId, thumbnail, photoUrl) {
   // Update main photo
   const mainPhoto = document.getElementById('main-photo-' + autoId);
   mainPhoto.querySelector('img').src = photoUrl;
-  
-  // Update lightbox click to use current photo
+
+  // Update lightbox click to use the current photo + full photo set for this auto
+  const photos = (autosData[autoId] && autosData[autoId].fotos) ? autosData[autoId].fotos : [photoUrl];
   mainPhoto.querySelector('img').onclick = function() {
-    openLightbox(photoUrl);
+    openLightbox(photos, photoUrl);
   };
-  
+
   // Update active thumbnail
   const thumbnails = thumbnail.parentElement.querySelectorAll('.thumbnail');
   thumbnails.forEach(t => t.classList.remove('active'));
   thumbnail.classList.add('active');
 }
 
-function openLightbox(photoUrl) {
+let lightboxPhotos = [];
+let lightboxIndex = 0;
+
+function openLightbox(photos, photoUrl) {
+  lightboxPhotos = (photos && photos.length) ? photos : [photoUrl];
+  lightboxIndex = lightboxPhotos.indexOf(photoUrl);
+  if (lightboxIndex === -1) lightboxIndex = 0;
+  showLightboxPhoto();
   const lightbox = document.getElementById('lightbox');
-  const lightboxImg = document.getElementById('lightbox-img');
-  lightboxImg.src = photoUrl;
   lightbox.style.display = 'flex';
   document.body.style.overflow = 'hidden';
+}
+
+function showLightboxPhoto() {
+  const lightboxImg = document.getElementById('lightbox-img');
+  lightboxImg.src = lightboxPhotos[lightboxIndex];
+  const hasMultiple = lightboxPhotos.length > 1;
+  document.getElementById('lightbox-prev').style.display = hasMultiple ? 'flex' : 'none';
+  document.getElementById('lightbox-next').style.display = hasMultiple ? 'flex' : 'none';
+}
+
+function lightboxNext(e) {
+  if (e) e.stopPropagation();
+  if (!lightboxPhotos.length) return;
+  lightboxIndex = (lightboxIndex + 1) % lightboxPhotos.length;
+  showLightboxPhoto();
+}
+
+function lightboxPrev(e) {
+  if (e) e.stopPropagation();
+  if (!lightboxPhotos.length) return;
+  lightboxIndex = (lightboxIndex - 1 + lightboxPhotos.length) % lightboxPhotos.length;
+  showLightboxPhoto();
 }
 
 function closeLightbox() {
@@ -53,12 +81,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Close on Escape key
+  // Close on Escape, navigate with arrow keys while lightbox is open
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
       closeLightbox();
       closeAutoModal();
     }
+    const lightboxOpen = document.getElementById('lightbox').style.display === 'flex';
+    if (lightboxOpen && e.key === 'ArrowRight') lightboxNext();
+    if (lightboxOpen && e.key === 'ArrowLeft') lightboxPrev();
   });
 });
 
@@ -103,13 +134,13 @@ function openAutoModal(autoId) {
     modalGallery.innerHTML = `
       <div class="modal-main-photo">
         <img id="modal-main-img" src="${auto.fotos[0]}" alt="${auto.merk} ${auto.model}" 
-             style="cursor: pointer;" onclick="openModalLightbox('${auto.fotos[0]}')">
+             style="cursor: pointer;" onclick='openLightbox(${JSON.stringify(auto.fotos)}, "${auto.fotos[0]}")'>
       </div>
       ${auto.fotos.length > 1 ? `
       <div class="modal-thumbnails">
         ${auto.fotos.map((foto, index) => `
           <img src="${foto}" alt="Foto" class="modal-thumbnail ${index === 0 ? 'active' : ''}" 
-               onclick="changeModalPhoto(this, '${foto}')">
+               onclick="changeModalPhoto(this, '${foto}', ${autoId})">
         `).join('')}
       </div>
       ` : ''}
@@ -130,22 +161,19 @@ function closeAutoModal() {
   }
 }
 
-function changeModalPhoto(thumbnail, photoUrl) {
+function changeModalPhoto(thumbnail, photoUrl, autoId) {
   const mainImg = document.getElementById('modal-main-img');
+  const photos = (autosData[autoId] && autosData[autoId].fotos) ? autosData[autoId].fotos : [photoUrl];
   if (mainImg) {
     mainImg.src = photoUrl;
     mainImg.onclick = function() {
-      openModalLightbox(photoUrl);
+      openLightbox(photos, photoUrl);
     };
   }
   
   const thumbnails = thumbnail.parentElement.querySelectorAll('.modal-thumbnail');
   thumbnails.forEach(t => t.classList.remove('active'));
   thumbnail.classList.add('active');
-}
-
-function openModalLightbox(photoUrl) {
-  openLightbox(photoUrl);
 }
 </script>
 
@@ -172,7 +200,7 @@ function openModalLightbox(photoUrl) {
         {% if auto.fotos %}
           <div class="main-photo" id="main-photo-{{ auto.id }}">
             <img src="{{ auto.fotos[0] }}" alt="{{ auto.merk }} {{ auto.model }}" 
-                 onclick="openLightbox('{{ auto.fotos[0] }}')" style="cursor: pointer;">
+                 onclick="openLightbox({{ auto.fotos | tojson }}, '{{ auto.fotos[0] }}')" style="cursor: pointer;">
           </div>
           {% if auto.fotos|length > 1 %}
           <div class="photo-thumbnails">
@@ -238,7 +266,9 @@ function openModalLightbox(photoUrl) {
 <!-- Lightbox Modal -->
 <div id="lightbox" class="lightbox" style="display: none;">
   <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+  <span id="lightbox-prev" class="lightbox-arrow lightbox-arrow-left" onclick="lightboxPrev(event)">&#10094;</span>
   <img id="lightbox-img" class="lightbox-content" src="" alt="Vergrote foto">
+  <span id="lightbox-next" class="lightbox-arrow lightbox-arrow-right" onclick="lightboxNext(event)">&#10095;</span>
 </div>
 
 <!-- Auto Detail Modal -->

@@ -37,6 +37,11 @@ ALLOWED_VIDEO_EXTENSIONS = {"mp4", "webm", "ogg"}
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-key-verander-dit-in-productie")
 
+# Veiligheidsmarge onder de vaste 100MB-limiet van de hosting (PythonAnywhere).
+# De upload-formulieren waarschuwen al vooraf via JavaScript; dit is het
+# serverzijdige vangnet voor als iemand die controle omzeilt.
+app.config["MAX_CONTENT_LENGTH"] = 90 * 1024 * 1024
+
 # Standaard admin-account (wordt eenmalig aangemaakt als er nog geen admin bestaat).
 # BELANGRIJK: verander dit wachtwoord na de eerste login, of zet het via omgevingsvariabelen.
 DEFAULT_ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "cuneytmutlu")
@@ -63,6 +68,12 @@ login_manager.login_message = "Log in als admin om deze pagina te bekijken."
 login_manager.login_message_category = "error"
 
 EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+@app.errorhandler(413)
+def bestand_te_groot(e):
+    flash("Het bestand (of de gezamenlijke bestanden) dat je probeerde te uploaden is te groot. Selecteer minder of kleinere bestanden.", "error")
+    return redirect(request.referrer or url_for("admin_dashboard"))
 
 
 def allowed_file(filename):
@@ -179,9 +190,12 @@ def init_db():
     """)
     db.commit()
 
-    # Maak een standaard-admin aan als er nog geen enkele admin bestaat.
-    existing = db.execute("SELECT COUNT(*) AS c FROM admins").fetchone()
-    if existing["c"] == 0:
+    # Zorg dat er een admin-account bestaat, en dat het overeenkomt met de
+    # ADMIN_USERNAME/ADMIN_PASSWORD omgevingsvariabelen (WSGI-bestand). Zo
+    # kan de inlog aangepast worden door enkel die 2 regels te wijzigen en
+    # de webapp te herladen, zonder een apart script te moeten draaien.
+    existing = db.execute("SELECT id, username, password_hash FROM admins LIMIT 1").fetchone()
+    if existing is None:
         db.execute(
             "INSERT INTO admins (username, password_hash) VALUES (?, ?)",
             (DEFAULT_ADMIN_USERNAME, generate_password_hash(DEFAULT_ADMIN_PASSWORD)),
@@ -193,6 +207,15 @@ def init_db():
         print(f"   wachtwoord:     {DEFAULT_ADMIN_PASSWORD}")
         print(" Log in via /admin/login en verander dit wachtwoord!")
         print("=" * 60)
+    else:
+        wachtwoord_klopt = check_password_hash(existing["password_hash"], DEFAULT_ADMIN_PASSWORD)
+        if existing["username"] != DEFAULT_ADMIN_USERNAME or not wachtwoord_klopt:
+            db.execute(
+                "UPDATE admins SET username = ?, password_hash = ? WHERE id = ?",
+                (DEFAULT_ADMIN_USERNAME, generate_password_hash(DEFAULT_ADMIN_PASSWORD), existing["id"]),
+            )
+            db.commit()
+            print(f"Admin-account bijgewerkt naar gebruikersnaam: {DEFAULT_ADMIN_USERNAME}")
 
     # Initialiseer standaard activiteit contactgegevens
     default_activity_contacts = {
@@ -627,6 +650,104 @@ def admin_auto_verwijderen(auto_id):
     db.commit()
     flash("Wagen verwijderd.", "success")
     return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/admin/auto/bewerken/<int:auto_id>", methods=["GET", "POST"])
+@login_required
+def admin_auto_bewerken(auto_id):
+    db = get_db()
+    auto = db.execute("SELECT * FROM autos WHERE id = ?", (auto_id,)).fetchone()
+    if not auto:
+        flash("Wagen niet gevonden.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    if request.method == "POST":
+        merk = request.form.get("merk", "").strip()
+        model = request.form.get("model", "").strip()
+        jaar = request.form.get("jaar", "").strip()
+        prijs = request.form.get("prijs", "").strip()
+        beschrijving = request.form.get("beschrijving", "").strip()
+        extra_info = request.form.get("extra_info", "").strip()
+
+        # Foto's die de gebruiker wil verwijderen (checkboxes, ids van auto_fotos rijen)
+        te_verwijderen_ids = request.form.getlist("verwijder_foto")
+
+        # Eventueel nieuwe foto's die mee geüpload worden
+        nieuwe_foto_urls = []
+        if "fotos" in request.files:
+            files = request.files.getlist("fotos")
+            ensure_upload_folder()
+            for file in files:
+                if file and file.filename and allowed_file(file.filename):
+                    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
+                    filename = f"{timestamp}_{file.filename}"
+                    file.save(os.path.join(UPLOAD_FOLDER, filename))
+                    nieuwe_foto_urls.append(f"/static/uploads/{filename}")
+
+        fouten = []
+        if not merk:
+            fouten.append("Merk is verplicht.")
+        if not model:
+            fouten.append("Model is verplicht.")
+        try:
+            jaar_int = int(jaar)
+        except (TypeError, ValueError):
+            fouten.append("Bouwjaar moet een geldig getal zijn.")
+            jaar_int = None
+        try:
+            prijs_float = float(prijs)
+        except (TypeError, ValueError):
+            fouten.append("Prijs moet een geldig getal zijn.")
+            prijs_float = None
+
+        if fouten:
+            for fout in fouten:
+                flash(fout, "error")
+            fotos = db.execute(
+                "SELECT * FROM auto_fotos WHERE auto_id = ? ORDER BY volgorde", (auto_id,)
+            ).fetchall()
+            return render_template(
+                "admin/edit_auto.html", active_page="admin", auto=auto, fotos=fotos
+            ), 400
+
+        db.execute(
+            "UPDATE autos SET merk = ?, model = ?, jaar = ?, prijs = ?, beschrijving = ?, extra_info = ? WHERE id = ?",
+            (merk, model, jaar_int, prijs_float, beschrijving, extra_info, auto_id),
+        )
+
+        # Verwijder aangevinkte bestaande foto's (bestand + databaserij)
+        for foto_id in te_verwijderen_ids:
+            foto_row = db.execute(
+                "SELECT foto_url FROM auto_fotos WHERE id = ? AND auto_id = ?", (foto_id, auto_id)
+            ).fetchone()
+            if foto_row:
+                foto_url = foto_row["foto_url"]
+                if foto_url.startswith("/static/uploads/"):
+                    filepath = os.path.join(UPLOAD_FOLDER, foto_url.replace("/static/uploads/", ""))
+                    if os.path.exists(filepath):
+                        os.remove(filepath)
+                db.execute("DELETE FROM auto_fotos WHERE id = ?", (foto_id,))
+
+        # Nieuwe foto's toevoegen na de bestaande (hoogste volgorde + 1)
+        if nieuwe_foto_urls:
+            max_volgorde = db.execute(
+                "SELECT MAX(volgorde) AS m FROM auto_fotos WHERE auto_id = ?", (auto_id,)
+            ).fetchone()
+            volgende_volgorde = (max_volgorde["m"] + 1) if max_volgorde["m"] is not None else 0
+            for i, foto_url in enumerate(nieuwe_foto_urls):
+                db.execute(
+                    "INSERT INTO auto_fotos (auto_id, foto_url, volgorde) VALUES (?, ?, ?)",
+                    (auto_id, foto_url, volgende_volgorde + i)
+                )
+
+        db.commit()
+        flash(f"{merk} {model} is bijgewerkt.", "success")
+        return redirect(url_for("admin_dashboard"))
+
+    fotos = db.execute(
+        "SELECT * FROM auto_fotos WHERE auto_id = ? ORDER BY volgorde", (auto_id,)
+    ).fetchall()
+    return render_template("admin/edit_auto.html", active_page="admin", auto=auto, fotos=fotos)
 
 
 # ---------------------------------------------------------------------------

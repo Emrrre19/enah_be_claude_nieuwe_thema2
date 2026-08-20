@@ -776,6 +776,34 @@ form.styled-form select:focus {
 .lightbox-close { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; transition: color 0.2s; user-select: none; }
 .lightbox-close:hover { color: var(--brand-2); }
 
+.lightbox-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  z-index: 2001;
+}
+.lightbox-arrow:hover { background: rgba(255,255,255,0.18); color: var(--brand-2); }
+.lightbox-arrow-left { left: 20px; }
+.lightbox-arrow-right { right: 20px; }
+
+@media (max-width: 768px) {
+  .lightbox-arrow { width: 44px; height: 44px; font-size: 18px; }
+  .lightbox-arrow-left { left: 8px; }
+  .lightbox-arrow-right { right: 8px; }
+}
+
 /* ---------- EDIT BUTTONS ---------- */
 .edit-buttons { display: flex; gap: 8px; margin-bottom: 20px; padding: 10px; background: var(--surface-2); border-radius: var(--radius-sm); border: 1px solid var(--border); }
 
@@ -898,6 +926,7 @@ footer {
   .info-strip .glass-card { grid-template-columns: 1fr; }
   .transport-gallery, .schoonmaak-gallery { grid-template-columns: 1fr 1fr; }
   .highlights-strip { grid-template-columns: 1fr; }
+  .hero-photo .hero-logo-bg { top: 1%; right: 8%; height: 11%; max-width: 20%; opacity: 0.4; }
 }
 
 @media (max-width: 480px) {

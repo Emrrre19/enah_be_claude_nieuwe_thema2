@@ -8,7 +8,7 @@
     <a class="btn btn-secondary" href="{{ url_for('admin_dashboard') }}">Terug naar dashboard</a>
   </div>
   
-  <form class="styled-form" method="POST" enctype="multipart/form-data">
+  <form class="styled-form" id="video-form" method="POST" enctype="multipart/form-data">
     <div>
       <label for="page_name">Pagina</label>
       <select id="page_name" name="page_name" required>
@@ -17,11 +17,40 @@
     </div>
     <div>
       <label for="video">Video bestand (mp4, webm, ogg)</label>
-      <input type="file" id="video" name="video" accept="video/*" required>
+      <input type="file" id="video" name="video" accept="video/*" required onchange="checkUploadSize(this)">
       <small style="color: var(--text-muted);">Selecteer een video bestand (maximaal 50MB aanbevolen)</small>
+      <small id="video-warning" style="display:none; color: var(--error); font-weight: 600;"></small>
     </div>
     <button class="btn" type="submit">Video uploaden</button>
   </form>
 </section>
+
+<script>
+const MAX_UPLOAD_BYTES = 90 * 1024 * 1024; // 90MB veiligheidsmarge onder de 100MB-limiet van de hosting
+
+function checkUploadSize(input) {
+  let total = 0;
+  for (const file of input.files) total += file.size;
+  const warningEl = document.getElementById(input.id + '-warning');
+  if (total > MAX_UPLOAD_BYTES) {
+    warningEl.textContent = `Let op: dit bestand is ${(total / (1024 * 1024)).toFixed(1)}MB — dat is te groot om te uploaden (max. ongeveer 90MB). Gebruik een kleiner/gecomprimeerd videobestand.`;
+    warningEl.style.display = 'block';
+  } else {
+    warningEl.style.display = 'none';
+  }
+}
+
+document.getElementById('video-form').addEventListener('submit', function(e) {
+  const videoInput = document.getElementById('video');
+  if (videoInput && videoInput.files.length) {
+    let total = 0;
+    for (const file of videoInput.files) total += file.size;
+    if (total > MAX_UPLOAD_BYTES) {
+      e.preventDefault();
+      alert(`Dit videobestand is ${(total / (1024 * 1024)).toFixed(1)}MB. Dat is te groot om te uploaden. Gebruik een kleiner/gecomprimeerd videobestand.`);
+    }
+  }
+});
+</script>
 
 {% endblock %}
